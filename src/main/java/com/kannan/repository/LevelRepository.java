@@ -12,4 +12,6 @@ public interface LevelRepository {
     Stream<Level> getAll();
 
     Stream<Level> get(Optional<Integer> levelId);
+
+    int seatCount(Optional<Integer> levelId);
 }
