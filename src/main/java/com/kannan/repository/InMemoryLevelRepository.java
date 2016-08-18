@@ -8,9 +8,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+/**
+ * Memory Repository for having stored all the level detail information
+ * @author Kannan Kuttalam
+ *
+ */
 @Component
 public class InMemoryLevelRepository implements LevelRepository {
+
+    //HashMap for storing level information
     private Map<Integer, Level> levels = new HashMap<>();
+
 
     @Override
     public void add(Level level) {
@@ -35,6 +43,7 @@ public class InMemoryLevelRepository implements LevelRepository {
         return this.get(levelId).map(Level::availableSeats).mapToInt(i -> i).sum();
     }
 
+    
     private boolean isInvalidLevel(Optional<Integer> levelId) {
         return levelId.isPresent() && !levels.containsKey(levelId.get());
     }

@@ -9,6 +9,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+/**
+ * Ticket Service Implementation implementing the TicketService interface
+ * @author Kannan Kuttalam
+ *
+ */
 @Component
 public class TicketServiceImpl implements TicketService {
     private LevelRepository levelRepository;
@@ -48,6 +53,13 @@ public class TicketServiceImpl implements TicketService {
         return null;
     }
 
+    /**
+     * Reserve the seats based on seat hold and customer
+     *
+     * @param seatHold seat held
+     * @param customerEmail email of the customer
+     * @return reservation id of the confirmed reservation
+     */
     private Reservation reserve(SeatHold seatHold, String customerEmail) {
         seatHolderService.unHold(seatHold);
         Reservation reservation = new Reservation(customerEmail, seatHold.getLevelId(), seatHold.getNumSeats());
