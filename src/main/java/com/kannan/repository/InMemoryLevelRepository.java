@@ -30,6 +30,11 @@ public class InMemoryLevelRepository implements LevelRepository {
         return levelId.map(level -> Stream.of(levels.get(level))).orElseGet(() -> levels.values().stream());
     }
 
+    @Override
+    public int seatCount(Optional<Integer> levelId) {
+        return this.get(levelId).map(Level::availableSeats).mapToInt(i -> i).sum();
+    }
+
     private boolean isInvalidLevel(Optional<Integer> levelId) {
         return levelId.isPresent() && !levels.containsKey(levelId.get());
     }
