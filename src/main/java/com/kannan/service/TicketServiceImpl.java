@@ -1,6 +1,6 @@
 package com.kannan.service;
 
-import com.kannan.model.Level;
+import com.kannan.exception.SeatNotAvailableException;
 import com.kannan.model.Reservation;
 import com.kannan.model.SeatHold;
 import com.kannan.repository.LevelRepository;
@@ -22,18 +22,17 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public int numSeatsAvailable(Optional<Integer> venueLevel) {
-        return levelRepository.get(venueLevel).map(Level::availableSeats).mapToInt(i -> i).sum();
+        return levelRepository.seatCount(venueLevel);
     }
 
     @Override
-    public SeatHold findAndHoldSeats(int numSeats, Optional<Integer> minLevel, Optional<Integer> maxLevel, String customerEmail) {
+    public SeatHold findAndHoldSeats(int numSeats, Optional<Integer> minLevel, Optional<Integer> maxLevel, String customerEmail) throws SeatNotAvailableException {
         int start = minLevel.orElseGet(() -> 1);
         int end = maxLevel.orElseGet(() -> Integer.MAX_VALUE);
         for (int i = start; i <= end; i++) {
             Optional<Integer> levelId = Optional.of(i);
             int seats = numSeatsAvailable(levelId);
             if (seats >= numSeats) {
-                levelRepository.get(levelId).forEach(level -> level.incrementHold(numSeats));
                 return seatHolderService.holdSeats(i, numSeats, customerEmail);
             }
         }
