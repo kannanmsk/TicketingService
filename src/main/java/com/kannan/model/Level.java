@@ -45,6 +45,10 @@ public class Level {
         return totalSeats() - unAvailableSeats();
     }
 
+    public int getHeldSeats() {
+        return heldSeats;
+    }
+
     private int totalSeats() {
         return numRows * seatsInRow;
     }
