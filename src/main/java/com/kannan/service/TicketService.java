@@ -1,5 +1,6 @@
 package com.kannan.service;
 
+import com.kannan.exception.SeatNotAvailableException;
 import com.kannan.model.SeatHold;
 
 import java.util.Optional;
@@ -24,7 +25,7 @@ public interface TicketService {
      * information
      */
     SeatHold findAndHoldSeats(int numSeats, Optional<Integer> minLevel,
-                              Optional<Integer> maxLevel, String customerEmail);
+                              Optional<Integer> maxLevel, String customerEmail) throws SeatNotAvailableException;
 
     /**
      * Commit seats held for a specific customer
