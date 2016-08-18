@@ -1,5 +1,6 @@
 package com.kannan.service;
 
+import com.kannan.exception.SeatNotAvailableException;
 import com.kannan.model.SeatHold;
 import com.kannan.repository.LevelRepository;
 import org.joda.time.DateTime;
@@ -7,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
+import static java.lang.String.format;
 
 @Component
 public class SeatHolderService {
@@ -52,11 +53,16 @@ public class SeatHolderService {
         return expiryTime * 60 * 1000;
     }
 
-    public SeatHold holdSeats(int level, int numSeats, String customerEmail) {
+    public SeatHold holdSeats(int levelId, int numSeats, String customerEmail) throws SeatNotAvailableException {
         synchronized (this) {
-            SeatHold seatHold = new SeatHold(level, customerEmail, numSeats, DateTime.now());
-            seatHolds.put(seatHold.getSeatHoldId(), seatHold);
-            return seatHold;
+            int available = levelRepository.seatCount(Optional.of(levelId));
+            if (available >= numSeats) {
+                SeatHold seatHold = new SeatHold(levelId, customerEmail, numSeats, DateTime.now());
+                seatHolds.put(seatHold.getSeatHoldId(), seatHold);
+                levelRepository.get(Optional.of(levelId)).forEach(level -> level.incrementHold(numSeats));
+                return seatHold;
+            }
+            throw new SeatNotAvailableException(format("Seats wanted %d, but only %d available", numSeats, available));
         }
     }
 
@@ -70,5 +76,13 @@ public class SeatHolderService {
         synchronized (this) {
             return seatHolds.get(seatHoldId);
         }
+    }
+
+    public void setExpiryTime(int expiryTime) {
+        this.expiryTime = expiryTime;
+    }
+
+    public List<SeatHold> getAllSeatHolds() {
+        return new ArrayList<>(seatHolds.values());
     }
 }
